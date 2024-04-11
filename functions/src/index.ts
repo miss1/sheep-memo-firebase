@@ -112,3 +112,37 @@ export const deleteTrip = onRequest({cors: cors}, async (request, response) => {
     response.status(500).send("Error delete Trip");
   }
 });
+
+export const queryRecipes = onRequest({cors: cors},
+  async (request, response) => {
+    try {
+      const querySnapshot = await getFirestore().collection("recipes").get();
+
+      const documents: unknown[] = [];
+      querySnapshot.forEach((doc) => {
+        documents.push({
+          id: doc.id,
+          ...doc.data(),
+        });
+      });
+
+      response.json(documents);
+    } catch (error) {
+      console.error("Error getting documents:", error);
+      response.status(500).send("Error getting Recipes");
+    }
+  });
+
+export const createRecipe = onRequest({cors: cors},
+  async (request, response) => {
+    try {
+      const newData = request.body;
+
+      await getFirestore().collection("recipes").add(newData);
+
+      response.status(200).send("create successfully");
+    } catch (error) {
+      console.error("Error create documents:", error);
+      response.status(500).send("Error create Recipe");
+    }
+  });
